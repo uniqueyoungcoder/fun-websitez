@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Users</title>
+    
+    <!-- Add Google Fonts link for Rubik Bubbles -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Puddles&display=swap" rel="stylesheet">
+    
     <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js"></script>
     <style>
+        /* Apply Rubik Bubbles font */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Rubik Puddles', sans-serif;
             margin: 20px;
             text-align: center;
         }
@@ -40,7 +45,6 @@
     </div>
 
     <script>
-        // Replace with your Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyApF4aLLrcgk3zi99v-__P93R0exmqWk1M",
             authDomain: "funwebsitez-3e5bb.firebaseapp.com",
@@ -52,14 +56,12 @@
             measurementId: "G-XN19NYV5WK"
         };
 
-        // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         let currentUser = null;
         const userListRef = database.ref("users");
 
-        // Join the website
         function join() {
             const username = document.getElementById("username").value.trim();
             if (!username) {
@@ -69,4 +71,35 @@
             currentUser = username;
             document.getElementById("currentUser").textContent = username;
 
-            // Add user 
+            const userRef = userListRef.child(username);
+            userRef.set(true);
+
+            userRef.onDisconnect().remove();
+
+            document.getElementById("login").style.display = "none";
+            document.getElementById("app").style.display = "block";
+
+            userListRef.on("value", (snapshot) => {
+                const users = snapshot.val();
+                const userList = document.getElementById("userList");
+                userList.innerHTML = "";
+                for (const user in users) {
+                    const li = document.createElement("li");
+                    li.textContent = user;
+                    userList.appendChild(li);
+                }
+            });
+        }
+
+        function leave() {
+            if (currentUser) {
+                userListRef.child(currentUser).remove();
+                currentUser = null;
+            }
+            document.getElementById("login").style.display = "block";
+            document.getElementById("app").style.display = "none";
+        }
+    </script>
+</body>
+</html>
+
